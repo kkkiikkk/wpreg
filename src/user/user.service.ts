@@ -21,8 +21,25 @@ export class UserService {
   }
 
   async createUser(data: CreateUserDto): Promise<User> {
+    let username = data.username;
+
+    if (username) {
+      const existing = await this.prisma.user.findFirst({
+        where: { username },
+      });
+      if (existing) {
+        throw new Error('Username already taken');
+      }
+    } else {
+      const base = data.email ? data.email.split('@')[0] : 'user';
+      username = await this.generateUniqueUsername(base);
+    }
+
     return this.prisma.user.create({
-      data,
+      data: {
+        ...data,
+        username,
+      },
     });
   }
 
@@ -44,5 +61,22 @@ export class UserService {
     return this.prisma.user.findFirst({
       where: { emailVerifyToken: token },
     });
+  }
+
+  /**
+   * Generate a unique username by appending a random 4-digit suffix.
+   */
+  async generateUniqueUsername(base: string): Promise<string> {
+    const sanitized = base.toLowerCase().replace(/[^a-z0-9_]/g, '') || 'user';
+    let candidate: string;
+    let exists: User | null;
+    do {
+      const suffix = Math.floor(1000 + Math.random() * 9000).toString();
+      candidate = `${sanitized}_${suffix}`;
+      exists = await this.prisma.user.findFirst({
+        where: { username: candidate },
+      });
+    } while (exists);
+    return candidate;
   }
 }

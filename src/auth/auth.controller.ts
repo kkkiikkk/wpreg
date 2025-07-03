@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   UnauthorizedException,
   UseGuards,
   Req,
@@ -22,6 +24,7 @@ import {
   SwaggerAuthRefreshToken,
   SwaggerConnectWallet,
   SwaggerVerifyEmail,
+  SwaggerUsernameSuggest,
 } from './swagger/auth.controller.decorators';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Request } from 'express';
@@ -33,10 +36,22 @@ export class AuthController {
 
   @Post('signin')
   @SwaggerAuthSignin()
-  async signin(@Body() signinData: AuthLoginDto): Promise<TokenResponse> {
+  async signin(
+    @Body() signinData: AuthLoginDto,
+  ): Promise<
+    TokenResponse | { needsEmailVerification: boolean; email: string }
+  > {
     try {
       const user = await this.authService.authenticate(signinData);
-      return this.authService.login(user.id);
+
+      if (signinData.loginMethod === 'email') {
+        return {
+          needsEmailVerification: true,
+          email: user.email || '',
+        };
+      }
+
+      return this.authService.login(user.id, user.username || undefined);
     } catch (error) {
       throw new UnauthorizedException(error.message || 'Authentication failed');
     }
@@ -74,6 +89,13 @@ export class AuthController {
         error.message || 'Failed to connect wallet',
       );
     }
+  }
+
+  @Get('username-suggest')
+  @SwaggerUsernameSuggest()
+  async usernameSuggest(@Query('base') base?: string) {
+    const username = await this.authService.generateUsername(base);
+    return { username };
   }
 
   @Post('verify-email')

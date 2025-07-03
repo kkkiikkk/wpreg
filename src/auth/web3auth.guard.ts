@@ -24,6 +24,7 @@ export class Web3AuthGuard implements CanActivate {
 
     try {
       const user = await this.authService.verifyToken(token);
+      console.log('uSER', user)
       request.user = user;
       return true;
     } catch {

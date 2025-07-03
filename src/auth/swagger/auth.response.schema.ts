@@ -1,5 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class EmailVerificationRequiredSchema {
+  @ApiProperty({
+    description: 'Flag indicating email verification is required',
+    example: true,
+  })
+  needsEmailVerification: boolean;
+
+  @ApiProperty({
+    description: 'Email address to verify',
+    example: 'user@example.com',
+  })
+  email: string;
+}
+
 export class TokenResponseSchema {
   @ApiProperty({
     description: 'JWT access token',
@@ -12,6 +26,18 @@ export class TokenResponseSchema {
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   refresh_token: string;
+
+  @ApiProperty({
+    description: 'Username associated with the authenticated user',
+    example: 'user_1234',
+  })
+  username: string;
+
+  @ApiProperty({
+    description: 'Seconds until the access token expires',
+    example: 3600,
+  })
+  expires_in: number;
 }
 
 export class UserResponseSchema {
@@ -51,6 +77,14 @@ export class UserResponseSchema {
     example: '2023-01-15T10:30:45.123Z',
   })
   updatedAt: Date;
+}
+
+export class UsernameResponseSchema {
+  @ApiProperty({
+    description: 'Suggested unique username',
+    example: 'user_4821',
+  })
+  username: string;
 }
 
 export class ErrorResponseSchema {
