@@ -1,7 +1,7 @@
 import { ExtractJwt } from 'passport-jwt';
 
 export interface JwtPayload {
-  sub: string;
+  userId: string;
 }
 
 export type JwtFromRequestFunction = ReturnType<
@@ -13,3 +13,4 @@ export type JwtConfig = {
   ignoreExpiration: boolean;
   secretOrKey: string;
 };
+// export interface

@@ -6,8 +6,7 @@ import {
   SubscribeMessage,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { UseGuards, Injectable } from '@nestjs/common';
-import { Web3AuthGuard } from '../auth/web3auth.guard';
+import { Injectable } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { WebSocketResponse, UserConnectionInfo } from './websocket.types';
 
@@ -55,7 +54,6 @@ export class WebSocketGateway
     this.connectedClients.delete(client.id);
   }
 
-  @UseGuards(Web3AuthGuard)
   @SubscribeMessage('message')
   handleMessage(client: Socket, payload: unknown): WebSocketResponse {
     const clientInfo = this.connectedClients.get(client.id);

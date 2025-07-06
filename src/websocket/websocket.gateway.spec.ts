@@ -59,7 +59,7 @@ describe.skip('WebSocketGateway', () => {
 
     gateway = module.get<WebSocketGateway>(WebSocketGateway);
     authService = module.get<AuthService>(AuthService);
-    
+
     gateway.server = mockServer as unknown as Server;
   });
 
@@ -74,7 +74,7 @@ describe.skip('WebSocketGateway', () => {
   describe('handleConnection', () => {
     it('should add client to connected clients map', () => {
       gateway.handleConnection(mockSocket as unknown as Socket);
-      
+
       expect(gateway['connectedClients'].has('socket-id')).toBe(true);
       const client = gateway['connectedClients'].get('socket-id');
       expect(client).toBeDefined();
@@ -83,9 +83,9 @@ describe.skip('WebSocketGateway', () => {
 
     it('should authenticate client with token and join user room', async () => {
       mockAuthService.verifyToken.mockResolvedValueOnce(mockUser);
-      
+
       await gateway.handleConnection(mockSocket as unknown as Socket);
-      
+
       expect(mockAuthService.verifyToken).toHaveBeenCalledWith('valid-token');
       expect(mockSocket.join).toHaveBeenCalledWith(`user-${mockUser.id}`);
       const client = gateway['connectedClients'].get('socket-id');
@@ -94,10 +94,12 @@ describe.skip('WebSocketGateway', () => {
     });
 
     it('should handle authentication error gracefully', async () => {
-      mockAuthService.verifyToken.mockRejectedValueOnce(new Error('Invalid token'));
-      
+      mockAuthService.verifyToken.mockRejectedValueOnce(
+        new Error('Invalid token'),
+      );
+
       await gateway.handleConnection(mockSocket as unknown as Socket);
-      
+
       expect(mockAuthService.verifyToken).toHaveBeenCalledWith('valid-token');
       expect(mockSocket.join).not.toHaveBeenCalled();
       const client = gateway['connectedClients'].get('socket-id');
@@ -108,33 +110,43 @@ describe.skip('WebSocketGateway', () => {
 
   describe('handleDisconnect', () => {
     it('should remove client from connected clients map', () => {
-      gateway['connectedClients'].set('socket-id', { socket: mockSocket as unknown as Socket });
-      
+      gateway['connectedClients'].set('socket-id', {
+        socket: mockSocket as unknown as Socket,
+      });
+
       gateway.handleDisconnect(mockSocket as unknown as Socket);
-      
+
       expect(gateway['connectedClients'].has('socket-id')).toBe(false);
     });
   });
 
   describe('handleMessage', () => {
     it('should return error response when user is not authenticated', () => {
-      gateway['connectedClients'].set('socket-id', { socket: mockSocket as unknown as Socket });
-      
+      gateway['connectedClients'].set('socket-id', {
+        socket: mockSocket as unknown as Socket,
+      });
+
       const payload = { content: 'test message' };
-      const result = gateway.handleMessage(mockSocket as unknown as Socket, payload);
-      
+      const result = gateway.handleMessage(
+        mockSocket as unknown as Socket,
+        payload,
+      );
+
       expect(result).toEqual({ event: 'error', message: 'Unauthorized' });
     });
 
     it('should handle and return message when user is authenticated', () => {
-      gateway['connectedClients'].set('socket-id', { 
+      gateway['connectedClients'].set('socket-id', {
         socket: mockSocket as unknown as Socket,
-        userId: mockUser.id
+        userId: mockUser.id,
       });
-      
+
       const payload = { content: 'test message' };
-      const result = gateway.handleMessage(mockSocket as unknown as Socket, payload);
-      
+      const result = gateway.handleMessage(
+        mockSocket as unknown as Socket,
+        payload,
+      );
+
       expect(result).toEqual({ event: 'message', data: payload });
     });
   });
@@ -143,30 +155,30 @@ describe.skip('WebSocketGateway', () => {
     it('should emit message to all authenticated users', () => {
       const mockSocket2 = { ...mockSocket, id: 'socket-id-2' };
       const mockSocket3 = { ...mockSocket, id: 'socket-id-3' };
-      
-      gateway['connectedClients'].set('socket-id', { 
+
+      gateway['connectedClients'].set('socket-id', {
         socket: mockSocket as unknown as Socket,
-        userId: mockUser.id
+        userId: mockUser.id,
       });
-      
-      gateway['connectedClients'].set('socket-id-2', { 
+
+      gateway['connectedClients'].set('socket-id-2', {
         socket: mockSocket2 as unknown as Socket,
-        userId: 'user-id-2'
+        userId: 'user-id-2',
       });
-      
-      gateway['connectedClients'].set('socket-id-3', { 
+
+      gateway['connectedClients'].set('socket-id-3', {
         socket: mockSocket3 as unknown as Socket,
       });
-      
+
       const event = 'testEvent';
       const data = { test: 'data' };
-      
-      (mockSocket.emit as jest.Mock).mockClear();
-      (mockSocket2.emit as jest.Mock).mockClear();
-      (mockSocket3.emit as jest.Mock).mockClear();
-      
+
+      mockSocket.emit.mockClear();
+      mockSocket2.emit.mockClear();
+      mockSocket3.emit.mockClear();
+
       gateway.broadcastToAuthenticatedUsers(event, data);
-      
+
       expect(mockSocket.emit).toHaveBeenCalledWith(event, data);
       expect(mockSocket2.emit).toHaveBeenCalledWith(event, data);
       expect(mockSocket3.emit).not.toHaveBeenCalled();
@@ -178,9 +190,9 @@ describe.skip('WebSocketGateway', () => {
       const event = 'testEvent';
       const data = { test: 'data' };
       const userId = 'user-id-1';
-      
+
       gateway.sendToUser(userId, event, data);
-      
+
       expect(mockServer.to).toHaveBeenCalledWith(`user-${userId}`);
       expect(mockServer.emit).toHaveBeenCalledWith(event, data);
     });

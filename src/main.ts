@@ -2,13 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import {
-  Web3AuthLoginDto,
-  EmailAuthDto,
-  ConnectWalletDto,
-  RefreshTokenDto,
-  AuthLoginDto,
-} from './auth/dto/auth.dto';
+import { RefreshTokenDto, AuthLoginDto } from './auth/dto/auth.dto';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -45,13 +39,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config, {
-    extraModels: [
-      AuthLoginDto,
-      Web3AuthLoginDto,
-      EmailAuthDto,
-      ConnectWalletDto,
-      RefreshTokenDto,
-    ],
+    extraModels: [AuthLoginDto, RefreshTokenDto],
   });
   SwaggerModule.setup('api/docs', app, document, {
     swaggerOptions: {

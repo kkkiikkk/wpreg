@@ -6,9 +6,9 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserModule } from '../user/user.module';
 import { JwtStrategy } from './jwt.strategy';
-import { Web3AuthGuard } from './web3auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import jwtConfig from '../config/jwt.config';
+import { Web3AuthService } from './web3auth.service';
 
 @Module({
   imports: [
@@ -21,12 +21,13 @@ import jwtConfig from '../config/jwt.config';
         secret: configService.get('jwt.secret'),
         signOptions: {
           expiresIn: configService.get('jwt.accessTokenExpiresIn'),
+          algorithm: 'HS256',
         },
       }),
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy, Web3AuthGuard, JwtAuthGuard],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard, Web3AuthService],
   controllers: [AuthController],
   exports: [AuthService, JwtAuthGuard],
 })

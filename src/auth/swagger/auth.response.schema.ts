@@ -1,19 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class EmailVerificationRequiredSchema {
-  @ApiProperty({
-    description: 'Flag indicating email verification is required',
-    example: true,
-  })
-  needsEmailVerification: boolean;
-
-  @ApiProperty({
-    description: 'Email address to verify',
-    example: 'user@example.com',
-  })
-  email: string;
-}
-
 export class TokenResponseSchema {
   @ApiProperty({
     description: 'JWT access token',
@@ -38,45 +24,6 @@ export class TokenResponseSchema {
     example: 3600,
   })
   expires_in: number;
-}
-
-export class UserResponseSchema {
-  @ApiProperty({
-    description: 'Unique user identifier',
-    example: 'user-id-1',
-  })
-  id: string;
-
-  @ApiProperty({
-    description: 'Ethereum address of the user',
-    example: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-  })
-  address: string;
-
-  @ApiProperty({
-    description: 'Username chosen by the user',
-    example: 'cryptouser',
-    nullable: true,
-  })
-  username?: string;
-
-  @ApiProperty({
-    description: 'Login method used by the user',
-    example: 'metamask',
-  })
-  loginMethod: string;
-
-  @ApiProperty({
-    description: 'Date when the user was created',
-    example: '2023-01-15T10:30:45.123Z',
-  })
-  createdAt: Date;
-
-  @ApiProperty({
-    description: 'Date when the user was last updated',
-    example: '2023-01-15T10:30:45.123Z',
-  })
-  updatedAt: Date;
 }
 
 export class UsernameResponseSchema {

@@ -5,13 +5,12 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { WebSocketModule } from './websocket/websocket.module';
 import jwtConfig from './config/jwt.config';
-import emailConfig from './config/email.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [jwtConfig, emailConfig],
+      load: [jwtConfig],
     }),
     PrismaModule,
     UserModule,

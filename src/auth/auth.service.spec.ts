@@ -18,8 +18,6 @@ describe('AuthService', () => {
     username: 'testuser',
     loginMethod: 'metamask',
     email: null,
-    isEmailVerified: false,
-    emailVerifyToken: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -27,7 +25,6 @@ describe('AuthService', () => {
   const mockUserService = {
     findByAddress: jest.fn(),
     findById: jest.fn(),
-    findByEmailVerifyToken: jest.fn(),
     findByEmail: jest.fn(),
     createUser: jest.fn(),
     updateUser: jest.fn(),
@@ -78,7 +75,7 @@ describe('AuthService', () => {
       const userId = 'user-id-1';
       const accessToken = 'access-token';
       const refreshToken = 'refresh-token';
-      
+
       mockJwtService.sign.mockImplementation((payload, options) => {
         if (payload.refresh) return refreshToken;
         return accessToken;
@@ -92,13 +89,19 @@ describe('AuthService', () => {
         expires_in: 3600,
       });
 
-      expect(jwtService.sign).toHaveBeenCalledWith({ sub: userId }, {
-        expiresIn: 3600,
-      });
+      expect(jwtService.sign).toHaveBeenCalledWith(
+        { sub: userId },
+        {
+          expiresIn: 3600,
+        },
+      );
 
-      expect(jwtService.sign).toHaveBeenCalledWith({ sub: userId, refresh: true }, {
-        expiresIn: 604800,
-      });
+      expect(jwtService.sign).toHaveBeenCalledWith(
+        { sub: userId, refresh: true },
+        {
+          expiresIn: 604800,
+        },
+      );
     });
   });
 
@@ -119,15 +122,21 @@ describe('AuthService', () => {
       const result = await service.refreshToken('valid-refresh-token');
 
       expect(result).toEqual(loginResult);
-      expect(jwtService.verifyAsync).toHaveBeenCalledWith('valid-refresh-token');
+      expect(jwtService.verifyAsync).toHaveBeenCalledWith(
+        'valid-refresh-token',
+      );
       expect(userService.findById).toHaveBeenCalledWith(mockUser.id);
       expect(service.login).toHaveBeenCalledWith(mockUser.id);
     });
 
     it('should throw UnauthorizedException when refresh token is invalid', async () => {
-      mockJwtService.verifyAsync.mockRejectedValueOnce(new Error('Invalid token'));
+      mockJwtService.verifyAsync.mockRejectedValueOnce(
+        new Error('Invalid token'),
+      );
 
-      await expect(service.refreshToken('invalid-token')).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken('invalid-token')).rejects.toThrow(
+        UnauthorizedException,
+      );
       expect(jwtService.verifyAsync).toHaveBeenCalledWith('invalid-token');
     });
 
@@ -135,7 +144,9 @@ describe('AuthService', () => {
       const invalidPayload = { sub: mockUser.id };
       mockJwtService.verifyAsync.mockResolvedValueOnce(invalidPayload);
 
-      await expect(service.refreshToken('token-without-refresh-flag')).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.refreshToken('token-without-refresh-flag'),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException when user not found', async () => {
@@ -143,16 +154,18 @@ describe('AuthService', () => {
       mockJwtService.verifyAsync.mockResolvedValueOnce(validPayload);
       mockUserService.findById.mockResolvedValueOnce(null);
 
-      await expect(service.refreshToken('token-with-invalid-user')).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.refreshToken('token-with-invalid-user'),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
-  
+
   describe('authenticate', () => {
     // Test cases for wallet-based authentication
     describe('with wallet address', () => {
       it('should return existing user if wallet address exists', async () => {
         mockUserService.findByAddress.mockResolvedValueOnce(mockUser);
-        
+
         const result = await service.authenticate({
           address: mockUser.address || '',
           loginMethod: 'metamask',
@@ -160,14 +173,16 @@ describe('AuthService', () => {
         });
 
         expect(result).toEqual(mockUser);
-        expect(mockUserService.findByAddress).toHaveBeenCalledWith(mockUser.address);
+        expect(mockUserService.findByAddress).toHaveBeenCalledWith(
+          mockUser.address,
+        );
         expect(mockUserService.createUser).not.toHaveBeenCalled();
       });
 
       it('should create and return a new user if wallet address is not found', async () => {
         mockUserService.findByAddress.mockResolvedValueOnce(null);
         mockUserService.createUser.mockResolvedValueOnce(mockUser);
-        
+
         const result = await service.authenticate({
           address: mockUser.address || '',
           loginMethod: 'metamask',
@@ -175,7 +190,9 @@ describe('AuthService', () => {
         });
 
         expect(result).toEqual(mockUser);
-        expect(mockUserService.findByAddress).toHaveBeenCalledWith(mockUser.address);
+        expect(mockUserService.findByAddress).toHaveBeenCalledWith(
+          mockUser.address,
+        );
         expect(mockUserService.createUser).toHaveBeenCalledWith({
           address: mockUser.address,
           loginMethod: 'metamask',
@@ -196,7 +213,7 @@ describe('AuthService', () => {
     describe('with wallet address', () => {
       it('should return existing user if wallet address exists', async () => {
         mockUserService.findByAddress.mockResolvedValueOnce(mockUser);
-        
+
         const result = await service.authenticate({
           address: mockUser.address || '',
           loginMethod: 'metamask',
@@ -204,14 +221,16 @@ describe('AuthService', () => {
         });
 
         expect(result).toEqual(mockUser);
-        expect(mockUserService.findByAddress).toHaveBeenCalledWith(mockUser.address);
+        expect(mockUserService.findByAddress).toHaveBeenCalledWith(
+          mockUser.address,
+        );
         expect(mockUserService.createUser).not.toHaveBeenCalled();
       });
 
       it('should create and return a new user if wallet address is not found', async () => {
         mockUserService.findByAddress.mockResolvedValueOnce(null);
         mockUserService.createUser.mockResolvedValueOnce(mockUser);
-        
+
         const result = await service.authenticate({
           address: mockUser.address || '',
           loginMethod: 'metamask',
@@ -219,7 +238,9 @@ describe('AuthService', () => {
         });
 
         expect(result).toEqual(mockUser);
-        expect(mockUserService.findByAddress).toHaveBeenCalledWith(mockUser.address);
+        expect(mockUserService.findByAddress).toHaveBeenCalledWith(
+          mockUser.address,
+        );
         expect(mockUserService.createUser).toHaveBeenCalledWith({
           address: mockUser.address,
           loginMethod: 'metamask',
@@ -248,7 +269,7 @@ describe('AuthService', () => {
 
       it('should return existing user if email exists', async () => {
         mockUserService.findByEmail.mockResolvedValueOnce(emailUser);
-        
+
         const result = await service.authenticate({
           email: 'test@example.com',
           loginMethod: 'email',
@@ -256,7 +277,9 @@ describe('AuthService', () => {
         });
 
         expect(result).toEqual(emailUser);
-        expect(mockUserService.findByEmail).toHaveBeenCalledWith('test@example.com');
+        expect(mockUserService.findByEmail).toHaveBeenCalledWith(
+          'test@example.com',
+        );
         expect(mockUserService.createUser).not.toHaveBeenCalled();
       });
 
@@ -264,7 +287,7 @@ describe('AuthService', () => {
         mockUserService.findByEmail.mockResolvedValueOnce(null);
         mockUserService.createUser.mockResolvedValueOnce(emailUser);
         jest.spyOn(service, 'sendVerificationEmail').mockResolvedValueOnce();
-        
+
         const result = await service.authenticate({
           email: 'test@example.com',
           loginMethod: 'email',
@@ -272,7 +295,9 @@ describe('AuthService', () => {
         });
 
         expect(result).toEqual(emailUser);
-        expect(mockUserService.findByEmail).toHaveBeenCalledWith('test@example.com');
+        expect(mockUserService.findByEmail).toHaveBeenCalledWith(
+          'test@example.com',
+        );
         expect(mockUserService.createUser).toHaveBeenCalled();
         // Verify token is generated and email is sent
         expect(service.sendVerificationEmail).toHaveBeenCalled();
@@ -285,7 +310,7 @@ describe('AuthService', () => {
     describe('with wallet address', () => {
       it('should return existing user if wallet address exists', async () => {
         mockUserService.findByAddress.mockResolvedValueOnce(mockUser);
-        
+
         const result = await service.authenticate({
           address: mockUser.address || '',
           loginMethod: 'metamask',
@@ -293,14 +318,16 @@ describe('AuthService', () => {
         });
 
         expect(result).toEqual(mockUser);
-        expect(mockUserService.findByAddress).toHaveBeenCalledWith(mockUser.address);
+        expect(mockUserService.findByAddress).toHaveBeenCalledWith(
+          mockUser.address,
+        );
         expect(mockUserService.createUser).not.toHaveBeenCalled();
       });
 
       it('should create and return a new user if wallet address is not found', async () => {
         mockUserService.findByAddress.mockResolvedValueOnce(null);
         mockUserService.createUser.mockResolvedValueOnce(mockUser);
-        
+
         const result = await service.authenticate({
           address: mockUser.address || '',
           loginMethod: 'metamask',
@@ -308,7 +335,9 @@ describe('AuthService', () => {
         });
 
         expect(result).toEqual(mockUser);
-        expect(mockUserService.findByAddress).toHaveBeenCalledWith(mockUser.address);
+        expect(mockUserService.findByAddress).toHaveBeenCalledWith(
+          mockUser.address,
+        );
         expect(mockUserService.createUser).toHaveBeenCalledWith({
           address: mockUser.address,
           loginMethod: 'metamask',
@@ -325,7 +354,7 @@ describe('AuthService', () => {
         ).rejects.toThrow(UnauthorizedException);
       });
     });
-    
+
     describe('with email', () => {
       const emailUser = {
         ...mockUser,
@@ -337,7 +366,7 @@ describe('AuthService', () => {
 
       it('should return existing user if email exists', async () => {
         mockUserService.findByEmail.mockResolvedValueOnce(emailUser);
-        
+
         const result = await service.authenticate({
           email: 'test@example.com',
           loginMethod: 'email',
@@ -345,7 +374,9 @@ describe('AuthService', () => {
         });
 
         expect(result).toEqual(emailUser);
-        expect(mockUserService.findByEmail).toHaveBeenCalledWith('test@example.com');
+        expect(mockUserService.findByEmail).toHaveBeenCalledWith(
+          'test@example.com',
+        );
         expect(mockUserService.createUser).not.toHaveBeenCalled();
       });
 
@@ -353,7 +384,7 @@ describe('AuthService', () => {
         mockUserService.findByEmail.mockResolvedValueOnce(null);
         mockUserService.createUser.mockResolvedValueOnce(emailUser);
         jest.spyOn(service, 'sendVerificationEmail').mockResolvedValueOnce();
-        
+
         const result = await service.authenticate({
           email: 'test@example.com',
           loginMethod: 'email',
@@ -361,7 +392,9 @@ describe('AuthService', () => {
         });
 
         expect(result).toEqual(emailUser);
-        expect(mockUserService.findByEmail).toHaveBeenCalledWith('test@example.com');
+        expect(mockUserService.findByEmail).toHaveBeenCalledWith(
+          'test@example.com',
+        );
         expect(mockUserService.createUser).toHaveBeenCalled();
         // Verify token is generated and email is sent
         expect(service.sendVerificationEmail).toHaveBeenCalled();
@@ -372,7 +405,7 @@ describe('AuthService', () => {
   describe('verifyToken', () => {
     it('should return user if token is valid', async () => {
       const validPayload = { sub: mockUser.id };
-      
+
       mockJwtService.verifyAsync.mockResolvedValueOnce(validPayload);
       mockUserService.findById.mockResolvedValueOnce(mockUser);
 
@@ -384,7 +417,9 @@ describe('AuthService', () => {
     });
 
     it('should throw UnauthorizedException when token is invalid', async () => {
-      mockJwtService.verifyAsync.mockRejectedValueOnce(new Error('Invalid token'));
+      mockJwtService.verifyAsync.mockRejectedValueOnce(
+        new Error('Invalid token'),
+      );
 
       const result = await service.verifyToken('invalid-token');
 
@@ -403,8 +438,6 @@ describe('AuthService', () => {
       expect(userService.findById).toHaveBeenCalledWith('non-existent-id');
     });
   });
-
-
 
   describe('verifyEmail', () => {
     const verificationToken = 'verify-token-123';

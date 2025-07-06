@@ -13,10 +13,10 @@ export class UserService {
     });
   }
 
-  async findByEmail(email: string): Promise<User | null> {
-    if (!email) return null;
+  async findByUsername(username?: string): Promise<User | null> {
+    if (!username) return null;
     return this.prisma.user.findUnique({
-      where: { email },
+      where: { username },
     });
   }
 
@@ -31,8 +31,7 @@ export class UserService {
         throw new Error('Username already taken');
       }
     } else {
-      const base = data.email ? data.email.split('@')[0] : 'user';
-      username = await this.generateUniqueUsername(base);
+      username = await this.generateUniqueUsername('user');
     }
 
     return this.prisma.user.create({
@@ -51,21 +50,14 @@ export class UserService {
   }
 
   async findById(id: string): Promise<User | null> {
+    if (!id) {
+      return null;
+    }
     return this.prisma.user.findUnique({
       where: { id },
     });
   }
 
-  async findByEmailVerifyToken(token: string): Promise<User | null> {
-    if (!token) return null;
-    return this.prisma.user.findFirst({
-      where: { emailVerifyToken: token },
-    });
-  }
-
-  /**
-   * Generate a unique username by appending a random 4-digit suffix.
-   */
   async generateUniqueUsername(base: string): Promise<string> {
     const sanitized = base.toLowerCase().replace(/[^a-z0-9_]/g, '') || 'user';
     let candidate: string;

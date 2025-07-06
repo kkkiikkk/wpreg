@@ -4,19 +4,15 @@ export interface User {
   email: string | null;
   username: string | null;
   loginMethod: string;
-  isEmailVerified: boolean;
-  emailVerifyToken: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface CreateUserDto {
-  address?: string;
+  address: string;
   email?: string;
   loginMethod: string;
   username?: string;
-  isEmailVerified?: boolean;
-  emailVerifyToken?: string;
 }
 
 export interface UpdateUserDto {
@@ -24,6 +20,4 @@ export interface UpdateUserDto {
   address?: string;
   email?: string;
   loginMethod?: string;
-  isEmailVerified?: boolean;
-  emailVerifyToken?: string;
 }
