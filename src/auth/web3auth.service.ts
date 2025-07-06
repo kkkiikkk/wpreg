@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { jwtVerify, createRemoteJWKSet } from 'jose';
+import * as jose from 'jose';
+const { jwtVerify, createRemoteJWKSet } = jose;
 import { computeAddress } from 'ethers';
 
 @Injectable()
