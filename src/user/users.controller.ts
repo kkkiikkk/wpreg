@@ -4,6 +4,8 @@ import {
   UseGuards,
   Req,
   NotFoundException,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -38,5 +40,32 @@ export class UsersController {
     }
 
     return user;
+  }
+
+  @Get('username/check')
+  @ApiOperation({ summary: 'Check if username is unique' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns whether the username is available',
+    schema: {
+      type: 'object',
+      properties: {
+        username: { type: 'string' },
+        isAvailable: { type: 'boolean' },
+      },
+    },
+  })
+  async checkUsernameUniqueness(
+    @Query('username') username: string,
+  ): Promise<{ username: string; isAvailable: boolean }> {
+    if (!username || username.trim().length === 0) {
+      throw new BadRequestException('Username is required');
+    }
+
+    const existingUser = await this.userService.findByUsername(username);
+    return {
+      username,
+      isAvailable: !existingUser,
+    };
   }
 }
