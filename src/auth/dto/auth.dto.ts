@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  Matches,
-  IsNotEmpty,
-  Length,
-} from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 /**
@@ -26,26 +19,6 @@ export class AuthLoginDto {
   })
   @IsString()
   loginMethod: string;
-
-  @ApiProperty({
-    description: 'Optional username',
-    example: 'user123',
-    required: false,
-    minLength: 3,
-    maxLength: 30,
-  })
-  @IsOptional()
-  @IsString()
-  @Length(3, 30, {
-    message: 'Username must be between 3 and 30 characters',
-  })
-  @Matches(/^[a-zA-Z0-9_]+$/, {
-    message: 'Username can only contain letters, numbers and underscores',
-  })
-  @Transform(({ value }: { value: string | undefined }): string | undefined => {
-    return value?.trim();
-  })
-  username?: string;
 
   @ApiProperty({
     description: 'Web3Auth ID token for authentication',

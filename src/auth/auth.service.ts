@@ -48,14 +48,13 @@ export class AuthService {
         email: web3AuthData?.email || '',
         address: wallet,
         loginMethod: web3AuthData.aggregateVerifier || web3AuthData.iss,
-        username: authData.username,
       });
     }
 
     return user;
   }
 
-  login(userId: string, username?: string): TokenResponse {
+  login(userId: string): TokenResponse {
     const payload: JwtPayload = { userId };
     const accessTokenExpiresIn =
       this.configService.get<number>('jwt.accessTokenExpiresIn') || 3600;
@@ -75,7 +74,6 @@ export class AuthService {
       access_token,
       refresh_token,
       expires_in: accessTokenExpiresIn,
-      username,
     };
   }
 
@@ -94,7 +92,7 @@ export class AuthService {
         throw new UnauthorizedException('User not found');
       }
 
-      return this.login(user.id, user.username ?? undefined);
+      return this.login(user.id);
     } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }

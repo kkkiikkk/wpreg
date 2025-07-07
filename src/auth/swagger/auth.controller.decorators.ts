@@ -37,7 +37,6 @@ export function SwaggerAuthSignin() {
             idToken:
               'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3YWxsZXRzIjpbeyJhZGRyZXNzIjoiMHg3MUM3NjU2RUM3YWI4OGIwOThkZWZCNzUxQjc0MDFCNWY2ZDg5NzZGIiwidHlwZSI6ImV0aGVyZXVtIn1dLCJhdWQiOiJXRUIzQVVUSF9DTElFTlRfSUQiLCJleHAiOjE3MDAwMDAwMDB9.signature',
             loginMethod: 'google',
-            username: 'social_user123', // Optional
           },
         },
         'wallet-connect-authentication': {
@@ -48,7 +47,6 @@ export function SwaggerAuthSignin() {
             idToken:
               'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3YWxsZXRzIjpbeyJhZGRyZXNzIjoiMHg4QUE2QjA1RkQ3OTk5QjcyNEIwRkZBMzJGM0ZDNkU0ODE5NzVBNTYiLCJ0eXBlIjoiZXRoZXJldW0ifV0sImF1ZCI6IldFQjNBVVRIX0NMSUVOVF9JRCIsImV4cCI6MTcwMDAwMDAwMH0.signature',
             loginMethod: 'wallet_connect',
-            username: 'wallet_user456',
           },
         },
       },

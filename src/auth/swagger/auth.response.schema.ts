@@ -14,12 +14,6 @@ export class TokenResponseSchema {
   refresh_token: string;
 
   @ApiProperty({
-    description: 'Username associated with the authenticated user',
-    example: 'user_1234',
-  })
-  username: string;
-
-  @ApiProperty({
     description: 'Seconds until the access token expires',
     example: 3600,
   })

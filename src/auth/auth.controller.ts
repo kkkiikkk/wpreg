@@ -26,7 +26,7 @@ export class AuthController {
     try {
       const user = await this.authService.authenticate(signinData);
 
-      return this.authService.login(user.id, user.username || undefined);
+      return this.authService.login(user.id);
     } catch (error) {
       throw new UnauthorizedException(error.message || 'Authentication failed');
     }
